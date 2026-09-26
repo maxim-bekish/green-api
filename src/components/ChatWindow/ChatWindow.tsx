@@ -1,7 +1,7 @@
-import { useState, type SubmitEvent } from 'react';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
 import { formatTime } from '../../lib/formatTime';
-import './ChatWindow.scss';
 import type { Chat } from '../../types';
+import './ChatWindow.scss';
 
 interface ChatWindowProps {
 	chat: Chat;
@@ -10,6 +10,14 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ chat, onSend }: ChatWindowProps) {
 	const [newMessage, setNewMessage] = useState('');
+	const messagesRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const messagesElement = messagesRef.current;
+		if (!messagesElement) return;
+
+		messagesElement.scrollTop = messagesElement.scrollHeight;
+	}, [chat.historyMessages]);
 
 	const submit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -32,7 +40,7 @@ export default function ChatWindow({ chat, onSend }: ChatWindowProps) {
 				<span className='chat-window__name'>{chat.phone}</span>
 			</header>
 
-			<div className='chat-window__messages'>
+			<div className='chat-window__messages' ref={messagesRef}>
 				{chat.historyMessages.length === 0 && (
 					<p className='chat-window__empty'>Отправьте первое сообщение</p>
 				)}
@@ -59,7 +67,7 @@ export default function ChatWindow({ chat, onSend }: ChatWindowProps) {
 					type='text'
 					placeholder='Сообщение'
 				/>
-				<button className='chat-window__send' type='submit'>
+				<button className='chat-window__send' type='submit' disabled={!newMessage.trim()}>
 					Отправить
 				</button>
 			</form>

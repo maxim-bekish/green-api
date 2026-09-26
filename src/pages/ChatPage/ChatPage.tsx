@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import ChatWindow from '../../components/ChatWindow/ChatWindow';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import type { Chat, Credentials, HistoryMessage } from '../../types';
-import { sendMessage } from '../../api/greenApi';
-import { addMessageToChat } from '../../lib/chats';
+import { deleteNotification, receiveNotification, sendMessage } from '../../api/greenApi';
+import { addMessageToChat, parseIncomingMessage } from '../../lib/chats';
 import { getStorageItem, setStorageItem } from '../../lib/storage';
 import './ChatPage.scss';
 
@@ -21,6 +21,38 @@ export default function ChatPage({ credentials }: ChatPageProps) {
 	useEffect(() => {
 		setStorageItem('chats', chats);
 	}, [chats]);
+
+	useEffect(() => {
+		let isPolling = true;
+
+		const poll = async () => {
+			while (isPolling) {
+				try {
+					const notification = await receiveNotification(credentials);
+					if (!notification) continue;
+
+					const incoming = parseIncomingMessage(notification.body);
+
+					if (incoming) {
+						setChats((prev) =>
+							addMessageToChat(prev, incoming.chatId, incoming.message),
+						);
+					}
+
+					await deleteNotification(credentials, notification.receiptId);
+				} catch (err) {
+					console.error(err);
+					await new Promise((resolve) => setTimeout(resolve, 5000));
+				}
+			}
+		};
+
+		poll();
+
+		return () => {
+			isPolling = false;
+		};
+	}, [credentials]);
 
 	const handleCreateChat = (phone: string) => {
 		const id = `${phone}@c.us`;

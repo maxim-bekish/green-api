@@ -6,6 +6,24 @@ interface StateInstanceResponse {
 interface SendMessageResponse {
 	idMessage: string;
 }
+export interface Notification {
+	receiptId: number;
+	body: {
+		typeWebhook: string;
+		idMessage: string;
+		timestamp: number;
+		senderData?: {
+			chatId: string;
+			senderPhoneNumber?: number;
+		};
+		messageData?: {
+			typeMessage: string;
+			textMessageData?: {
+				textMessage: string;
+			};
+		};
+	};
+}
 
 const buildUrl = (credentials: Credentials, method: string) => {
 	const { idInstance, apiTokenInstance } = credentials;
@@ -45,4 +63,25 @@ export const sendMessage = async (
 	checkResponse(response);
 
 	return response.json();
+};
+
+export const receiveNotification = async (
+	credentials: Credentials,
+): Promise<Notification | null> => {
+	const url = `${buildUrl(credentials, 'receiveNotification')}?receiveTimeout=5`;
+
+	const response = await fetch(url);
+	checkResponse(response);
+
+	return response.json();
+};
+
+export const deleteNotification = async (
+	credentials: Credentials,
+	receiptId: number,
+): Promise<void> => {
+	const url = `${buildUrl(credentials, 'deleteNotification')}/${receiptId}`;
+
+	const response = await fetch(url, { method: 'DELETE' });
+	checkResponse(response);
 };

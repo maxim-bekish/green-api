@@ -1,7 +1,7 @@
 import { useState, type SubmitEvent } from 'react';
 import type { Chat } from '../../types';
-import './Sidebar.scss';
 import { formatTime } from '../../lib/formatTime';
+import './Sidebar.scss';
 
 interface SidebarProps {
 	chats: Chat[];
@@ -26,9 +26,6 @@ export default function Sidebar({ chats, onCreateChat, activeChatId, onSelectCha
 		<aside className='sidebar'>
 			<header className='sidebar__header'>
 				<h1 className='sidebar__title'>Чаты</h1>
-				<button className='sidebar__logout' type='button'>
-					Выйти
-				</button>
 			</header>
 
 			<form className='sidebar__new-chat' onSubmit={submit}>
