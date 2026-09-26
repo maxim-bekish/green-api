@@ -1,75 +1,47 @@
-# React + TypeScript + Vite
+# Green API Chat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Простой веб-чат для отправки и получения текстовых сообщений в Telegram через сервис [GREEN-API](https://green-api.com). Тестовое задание на позицию Frontend-разработчик React.
 
-Currently, two official plugins are available:
+Демо: ?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Видео работы: ?
 
-## React Compiler
+## Как пользоваться
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Войти, указав `idInstance` и `apiTokenInstance` из личного кабинета GREEN-API. При входе данные проверяются методом `getStateInstance`, инстанс должен быть в статусе `authorized`.
+2. Ввести номер получателя в международном формате, только цифры и нажать «+».
+3. Написать сообщение. Ответ собеседника появится в чате автоматически.
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Запуск локально
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Нужен Node.js 20+.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+git clone https://github.com/maxim-bekish/green-api.git
+cd green-api
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Приложение откроется на http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Сборка: `npm run build`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Как устроено
 
+- Отправка — метод `sendMessage`.
+- Получение — методы `receiveNotification` и `deleteNotification`: приложение в цикле забирает уведомление из очереди, если это входящее текстовое сообщение от одного из открытых чатов — добавляет его в чат, затем удаляет уведомление из очереди.
+- Чаты и данные входа хранятся в `localStorage`, поэтому переписка сохраняется после перезагрузки страницы.
+
+Стек: React 19, TypeScript, Vite, SCSS (БЭМ).
+
+```
+src/
+  api/         запросы к GREEN-API
+  components/  LoginForm, Sidebar, ChatWindow
+  pages/       ChatPage — состояние чатов, отправка и получение
+  lib/         вспомогательные функции
+  types/       типы
+  styles/      SCSS-переменные
 ```
