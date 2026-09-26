@@ -1,0 +1,25 @@
+@use '../../styles/variables' as *;
+
+.chat-page {
+	display: flex;
+	height: 100dvh;
+
+	&__main {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+		min-width: 0;
+		background: $gradient-app;
+		flex-direction: column;
+	}
+
+	&__placeholder {
+		margin: 0;
+		padding: 6px 14px;
+		border-radius: $radius;
+		background: rgba(0, 0, 0, 0.15);
+		color: #fff;
+		font-size: 14px;
+	}
+}

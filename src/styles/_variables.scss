@@ -3,6 +3,7 @@ $color-primary-hover: #1668d1;
 
 $color-bg: #ffffff;
 $color-bg-secondary: #f2f3f5;
+$color-bg-active: #e8f2fd;
 $color-bg-chat: #e9edf2;
 $color-border: #dfe4ea;
 
@@ -16,6 +17,7 @@ $color-error: #e5484d;
 
 $gradient-app: linear-gradient(160deg, #8cc4f2 0%, #7fb6fb 45%, #93d3d6 100%);
 $gradient-card: linear-gradient(180deg, #d9e9fb 0%, #f2f6fb 100%);
+$gradient-avatar: linear-gradient(135deg, #3fa9ff 0%, #6d5dfc 100%);
 $shadow-card: 0 8px 32px rgba(30, 70, 130, 0.15);
 
 $sidebar-width: 320px;
@@ -23,7 +25,3 @@ $radius-lg: 24px;
 $radius: 12px;
 $radius-sm: 8px;
 
-input[readonly] {
-	opacity: 0.5;
-	pointer-events: none;
-}

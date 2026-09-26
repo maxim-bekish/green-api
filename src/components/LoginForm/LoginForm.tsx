@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import './LoginForm.scss';
 import type { Credentials } from '../../types';
 interface LoginFormProps {
@@ -13,7 +13,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
 	const isValid = !!idInstance.trim() && !!apiTokenInstance.trim();
 
-	const submit = async (e: FormEvent<HTMLFormElement>) => {
+	const submit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (!isValid) return;
 		setError(null);

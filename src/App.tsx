@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { getStateInstance } from './api/greenApi';
 import './App.scss';
 import LoginForm from './components/LoginForm/LoginForm';
+import ChatPage from './pages/ChatPage/ChatPage';
 import type { Credentials } from './types';
-import { getStateInstance } from './api/greenApi';
 
 function App() {
 	const [credentials, setCredentials] = useState<Credentials | null>(() => {
@@ -23,7 +24,7 @@ function App() {
 		return <LoginForm onLogin={handleLogin} />;
 	}
 
-	return <div>Чат</div>;
+	return <ChatPage />;
 }
 
 export default App;
