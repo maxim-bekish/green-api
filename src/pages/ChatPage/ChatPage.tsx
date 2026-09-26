@@ -1,30 +1,65 @@
 import { useEffect, useState } from 'react';
 import ChatWindow from '../../components/ChatWindow/ChatWindow';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import type { Chat } from '../../types';
+import type { Chat, Credentials, HistoryMessage } from '../../types';
+import { sendMessage } from '../../api/greenApi';
+import { addMessageToChat } from '../../lib/chats';
+import { getStorageItem, setStorageItem } from '../../lib/storage';
 import './ChatPage.scss';
 
-export default function ChatPage() {
-	const [chats, setChats] = useState<Chat[]>(() => {
-		const saved = localStorage.getItem('chats');
-		return saved ? JSON.parse(saved) : [];
-	});
+interface ChatPageProps {
+	credentials: Credentials;
+}
+
+export default function ChatPage({ credentials }: ChatPageProps) {
+	const [chats, setChats] = useState(() => getStorageItem<Chat[]>('chats') ?? []);
+
+	const [activeChatId, setActiveChatId] = useState<string | null>(null);
+
+	const activeChat = chats.find((chat) => chat.id === activeChatId);
+
 	useEffect(() => {
-		localStorage.setItem('chats', JSON.stringify(chats));
+		setStorageItem('chats', chats);
 	}, [chats]);
 
 	const handleCreateChat = (phone: string) => {
 		const id = `${phone}@c.us`;
-		if (chats.some((chat) => chat.id === id)) return;
 
-		setChats((prev) => [{ id, phone, messages: [] }, ...prev]);
+		if (!chats.some((chat) => chat.id === id)) {
+			setChats((prev) => [{ id, phone, historyMessages: [] }, ...prev]);
+		}
+		setActiveChatId(id);
 	};
+
+	const handleSend = async (text: string) => {
+		if (!activeChatId) return;
+
+		const { idMessage } = await sendMessage(credentials, activeChatId, text);
+
+		const message: HistoryMessage = {
+			id: idMessage,
+			text,
+			direction: 'outgoing',
+			timestamp: Math.floor(Date.now() / 1000),
+		};
+
+		setChats((prev) => addMessageToChat(prev, activeChatId, message));
+	};
+
 	return (
 		<div className='chat-page'>
-			<Sidebar chats={chats} onCreateChat={handleCreateChat} />
+			<Sidebar
+				chats={chats}
+				activeChatId={activeChatId}
+				onCreateChat={handleCreateChat}
+				onSelectChat={setActiveChatId}
+			/>
 			<main className='chat-page__main'>
-				{/* <p className='chat-page__placeholder'>Выберите чат или создайте новый</p> */}
-				<ChatWindow />
+				{activeChat ? (
+					<ChatWindow chat={activeChat} onSend={handleSend} />
+				) : (
+					<p className='chat-page__placeholder'>Выберите чат или создайте новый</p>
+				)}
 			</main>
 		</div>
 	);

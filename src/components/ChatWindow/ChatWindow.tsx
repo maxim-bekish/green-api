@@ -1,47 +1,43 @@
 import { useState, type SubmitEvent } from 'react';
 import { formatTime } from '../../lib/formatTime';
 import './ChatWindow.scss';
+import type { Chat } from '../../types';
 
-const chat = {
-	name: '+79991234587',
-	history: [
-		{
-			id: '0',
-			text: 'Привет! Это входящее',
-			direction: 'incoming',
-			timestamp: 1677721600,
-		},
-		{
-			id: '1',
-			text: 'А это исходящее',
-			direction: 'outgoing',
-			timestamp: 1677721601,
-		},
-	],
-};
+interface ChatWindowProps {
+	chat: Chat;
+	onSend: (text: string) => Promise<void>;
+}
 
-export default function ChatWindow() {
+export default function ChatWindow({ chat, onSend }: ChatWindowProps) {
 	const [newMessage, setNewMessage] = useState('');
 
-	const submit = (e: SubmitEvent<HTMLFormElement>) => {
+	const submit = async (e: SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		if (!newMessage.trim()) return;
+		const text = newMessage.trim();
+		if (!text) return;
+
+		try {
+			await onSend(text);
+			setNewMessage('');
+		} catch (err) {
+			console.error(err);
+		}
 	};
 
 	return (
 		<section className='chat-window'>
 			<header className='chat-window__header'>
-				<span className='chat-window__avatar'>{chat.name.slice(-2)}</span>
-				<span className='chat-window__name'>{chat.name}</span>
+				<span className='chat-window__avatar'>{chat.phone.slice(-2)}</span>
+				<span className='chat-window__name'>{chat.phone}</span>
 			</header>
 
 			<div className='chat-window__messages'>
-				{chat.history.length === 0 && (
+				{chat.historyMessages.length === 0 && (
 					<p className='chat-window__empty'>Отправьте первое сообщение</p>
 				)}
 
-				{chat.history.map((message) => {
+				{chat.historyMessages.map((message) => {
 					return (
 						<div
 							key={message.id}

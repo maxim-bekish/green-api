@@ -7,9 +7,9 @@ export interface Credentials {
 export interface Chat {
 	id: string;
 	phone: string;
-	messages: Message[];
+	historyMessages: HistoryMessage[];
 }
-export interface Message {
+export interface HistoryMessage {
 	id: string;
 	text: string;
 	direction: MessageDirection;

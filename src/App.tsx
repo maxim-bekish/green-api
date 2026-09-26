@@ -4,12 +4,12 @@ import './App.scss';
 import LoginForm from './components/LoginForm/LoginForm';
 import ChatPage from './pages/ChatPage/ChatPage';
 import type { Credentials } from './types';
+import { getStorageItem, setStorageItem } from './lib/storage';
 
 function App() {
-	const [credentials, setCredentials] = useState<Credentials | null>(() => {
-		const saved = localStorage.getItem('credentials');
-		return saved ? JSON.parse(saved) : null;
-	});
+	const [credentials, setCredentials] = useState<Credentials | null>(() =>
+		getStorageItem<Credentials>('credentials'),
+	);
 
 	const handleLogin = async (data: Credentials) => {
 		const { stateInstance } = await getStateInstance(data);
@@ -17,14 +17,14 @@ function App() {
 			throw new Error(`Инстанс не авторизован (статус: ${stateInstance})`);
 		}
 		setCredentials(data);
-		localStorage.setItem('credentials', JSON.stringify(data));
+		setStorageItem('credentials', data);
 	};
 
 	if (!credentials) {
 		return <LoginForm onLogin={handleLogin} />;
 	}
 
-	return <ChatPage />;
+	return <ChatPage credentials={credentials} />;
 }
 
 export default App;
